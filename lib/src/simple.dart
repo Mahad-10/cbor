@@ -83,6 +83,11 @@ class CborSimpleDecoder extends Converter<List<int>, Object?> {
         );
   }
 
+  Object? convertJSON(List<int> input) {
+    return const CborDecoder().convert(input).toJson(substituteValue: input);
+  }
+
+
   @override
   Sink<List<int>> startChunkedConversion(Sink<Object?> sink) {
     return const CborDecoder()
@@ -164,6 +169,24 @@ class CborSimpleCodec extends Codec<Object?, List<int>> {
       decodeBase64: decodeBase64,
     ).convert(encoded);
   }
+
+  Object? decodeJSON(
+      List<int> encoded, {
+        bool? parseDateTime,
+        bool? decodeBase64,
+        bool? parseUri,
+      }) {
+    parseDateTime ??= _parseDateTime;
+    decodeBase64 ??= _decodeBase64;
+    parseUri ??= _parseUri;
+
+    return CborSimpleDecoder(
+      parseDateTime: parseDateTime,
+      parseUri: parseUri,
+      decodeBase64: decodeBase64,
+    ).convertJSON(encoded);
+  }
+
 
   @override
   List<int> encode(
